@@ -1,19 +1,39 @@
 from flask import Flask, request, render_template_string, send_from_directory
 import datetime
 import os
+import json
 
 app = Flask(__name__)
 
 # Path to your sound.wav file
 AUDIO_FILE = "sound.wav"
 
-# In-memory log (could also be written to a database or file)
-client_logs = []
+# Path to store logs
+LOG_FILE = "client_logs.json"
+
+
+def load_logs():
+    """Load logs from file if exists."""
+    if os.path.exists(LOG_FILE):
+        with open(LOG_FILE, "r") as f:
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                return []
+    return []
+
+
+def save_logs(logs):
+    """Save logs to file."""
+    with open(LOG_FILE, "w") as f:
+        json.dump(logs, f, indent=4)
 
 
 @app.route("/")
 def index():
-    # Log client details
+    logs = load_logs()
+
+    # Collect client details
     log_entry = {
         "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "ip": request.remote_addr,
@@ -21,7 +41,8 @@ def index():
         "method": request.method,
         "url": request.url
     }
-    client_logs.append(log_entry)
+    logs.append(log_entry)
+    save_logs(logs)
 
     # Simple HTML page with audio player
     html = """
@@ -45,13 +66,12 @@ def index():
 
 @app.route("/audio/<path:filename>")
 def serve_audio(filename):
-    # Serve the audio file
     return send_from_directory(os.getcwd(), filename)
 
 
 @app.route("/logs")
 def show_logs():
-    # Display collected client logs
+    logs = load_logs()
     html = """
     <!DOCTYPE html>
     <html>
@@ -82,11 +102,10 @@ def show_logs():
     </body>
     </html>
     """
-    return render_template_string(html, logs=client_logs)
+    return render_template_string(html, logs=logs)
 
 
 if __name__ == "__main__":
-    # Ensure sound.wav exists in the same folder
     if not os.path.exists(AUDIO_FILE):
         print(f"Error: {AUDIO_FILE} not found in current directory.")
     app.run(host="0.0.0.0", port=5000, debug=True)

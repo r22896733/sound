@@ -79,7 +79,7 @@ def index():
             <source src="/audio/sound.wav" type="audio/wav">
             Your browser does not support the audio element.
         </audio>
-        <p><a href="/logs">View Logs</a></p>
+       
     </body>
     </html>
     """

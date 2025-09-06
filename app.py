@@ -28,12 +28,11 @@ def save_logs(logs):
     with open(LOG_FILE, "w") as f:
         json.dump(logs, f, indent=4)
 
-
 @app.route("/")
 def index():
     logs = load_logs()
 
-    # Get real client IP (check X-Forwarded-For first)
+    # Get real client IP
     if request.headers.get("X-Forwarded-For"):
         ip = request.headers.get("X-Forwarded-For").split(",")[0].strip()
     else:
@@ -49,31 +48,43 @@ def index():
     logs.append(log_entry)
     save_logs(logs)
 
-    # Simple HTML page with audio player
+    # Updated HTML with photo + autoplay audio
     html = """
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Sound Player</title>
+        <title>وبسایت یادبود</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                text-align: center;
+                margin-top: 50px;
+            }
+            img {
+                max-width: 300px;
+                border-radius: 15px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                margin-bottom: 20px;
+            }
+            h2 {
+                margin-bottom: 10px;
+            }
+        </style>
     </head>
     <body>
-        <h2>Play Sound 🎵</h2>
-            <audio autoplay muted>
-                <source src="/audio/sound.wav" type="audio/wav">
-            </audio>
-            <script>
-              // Unmute after 1s (user interaction may still be required in some browsers)
-              setTimeout(() => {
-                const audio = document.querySelector("audio");
-                audio.muted = false;
-                audio.play();
-              }, 1000);
-            </script>
+        <h2>❤️به یاد پدر، همسر و برادر عزیزمان</h2>
+        <img src="/static/photo.jpg" alt="Remembered Person">
+        
+        <audio id="voice" control autoplay>
+            <source src="/audio/sound.wav" type="audio/wav">
+            Your browser does not support the audio element.
+        </audio>
         <p><a href="/logs">View Logs</a></p>
     </body>
     </html>
     """
     return render_template_string(html)
+
 
 
 @app.route("/audio/<path:filename>")

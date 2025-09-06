@@ -75,7 +75,7 @@ def index():
         <h2>❤️به یاد پدر، همسر و برادر عزیزمان</h2>
         <img src="/static/photo.jpg" alt="Remembered Person">
         
-        <audio id="voice" control autoplay>
+        <audio id="voice" controls autoplay>
             <source src="/audio/sound.wav" type="audio/wav">
             Your browser does not support the audio element.
         </audio>

@@ -33,10 +33,15 @@ def save_logs(logs):
 def index():
     logs = load_logs()
 
-    # Collect client details
+    # Get real client IP (check X-Forwarded-For first)
+    if request.headers.get("X-Forwarded-For"):
+        ip = request.headers.get("X-Forwarded-For").split(",")[0].strip()
+    else:
+        ip = request.remote_addr
+
     log_entry = {
         "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "ip": request.remote_addr,
+        "ip": ip,
         "user_agent": request.headers.get("User-Agent"),
         "method": request.method,
         "url": request.url

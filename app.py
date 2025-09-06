@@ -58,10 +58,17 @@ def index():
     </head>
     <body>
         <h2>Play Sound 🎵</h2>
-        <audio controls autoplay>
-            <source src="/audio/sound.wav" type="audio/wav">
-            Your browser does not support the audio element.
-        </audio>
+            <audio autoplay muted>
+                <source src="/audio/sound.wav" type="audio/wav">
+            </audio>
+            <script>
+              // Unmute after 1s (user interaction may still be required in some browsers)
+              setTimeout(() => {
+                const audio = document.querySelector("audio");
+                audio.muted = false;
+                audio.play();
+              }, 1000);
+            </script>
         <p><a href="/logs">View Logs</a></p>
     </body>
     </html>
